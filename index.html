@@ -1,0 +1,413 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Chat Anônimo</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        background-image: url('image/background.jpg');
+        background-size: cover;
+        background-color: rgb(243, 239, 233);
+        background-position: center;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+        margin: 0;
+      }
+
+      h1 {
+        color: rgb(109, 105, 90);
+        font-weight: bold;
+        margin-bottom: 20px;
+        font-size: 25px;
+      }
+
+      #chat-container {
+        background-color: rgb(170, 160, 128); /* Fundo cinza */
+        border-radius: 10px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        width: 90%;
+        max-width: 490px;
+        height: 590px;
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+      }
+
+      #user-count {
+        text-align: center;
+        margin-top: 10px;
+        color: white;
+      }
+
+      #messages {
+        list-style-type: none;
+        margin: 0;
+        padding: 20px;
+        overflow-y: auto;
+        height: 300px;
+        flex-grow: 1;
+      }
+
+      #messages li {
+        padding: 10px;
+        margin-bottom: 10px;
+        border-radius: 5px;
+        word-wrap: break-word;
+      }
+
+      #messages li:nth-child(even) {
+        background-color: #007bff;
+        color: #ffffff;
+        text-align: right;
+        margin-left: auto;
+      }
+
+      #messages li:nth-child(odd) {
+        background-color: #28a745;
+        color: #ffffff;
+        text-align: left;
+        margin-right: auto;
+      }
+
+      #typing {
+        text-align: center;
+        font-style: italic;
+        color: white;
+        display: none; /* Inicialmente oculto */
+      }
+
+      #form {
+        display: flex;
+        padding: 10px;
+        background-color: #f1f1f1;
+        border-top: 1px solid #ccc;
+        flex-wrap: wrap;
+      }
+
+      #input {
+        flex: 1;
+        padding: 10px;
+        border-radius: 5px;
+        border: 1px solid #ccc;
+        margin-right: 10px;
+      }
+
+      button {
+        padding: 15px;
+        border: none;
+        border-radius: 5px;
+        background-color: #007bff;
+        color: #fff;
+        cursor: pointer;
+        transition: background-color 0.3s ease;
+      }
+
+      #recordButton {
+        background-color: #d1db3c;
+        color: #fff;
+        border: none;
+        border-radius: 5px;
+        padding: 15px;
+        cursor: pointer;
+        margin-right: 10px;
+        font-size: 16px;
+      }
+
+      button:hover {
+        background-color: #0056b3;
+      }
+
+      #uploadButton {
+        background-color: #ba64e2;
+        color: #fff;
+        border: none;
+        border-radius: 5px;
+        padding: 15px;
+        cursor: pointer;
+        margin-right: 10px;
+        font-size: 16px;
+      }
+
+      #uploadButton:hover {
+        background-color: #0056b3;
+      }
+
+      #emoji-container {
+        position: relative;
+        display: inline-block;
+        margin-right: 10px;
+      }
+
+      #emoji-button {
+        cursor: pointer;
+        background: transparent;
+        border: none;
+        font-size: 20px;
+      }
+
+      #emoji-menu {
+        display: none;
+        position: absolute;
+        background-color: #f1f1f1;
+        box-shadow: 0px 8px 16px 0px rgba(0, 0, 0, 0.2);
+        z-index: 1;
+        border-radius: 5px;
+        padding: 5px;
+      }
+
+      #emoji-menu .emoji {
+        cursor: pointer;
+        font-size: 20px;
+        padding: 5px;
+        transition: background-color 0.2s ease;
+      }
+
+      #emoji-menu .emoji:hover {
+        background-color: #ddd;
+      }
+
+      #emoji-container:hover #emoji-menu {
+        display: block;
+      }
+
+      @media (max-width: 600px) {
+        #messages {
+          height: 200px;
+        }
+
+        #form {
+          flex-direction: column;
+        }
+
+        #input {
+          margin-bottom: 10px;
+          margin-right: 0;
+        }
+
+        button {
+          width: 100%;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Chat Puro Tempero Anônimo</h1>
+    <div id="chat-container">
+      <div id="user-count">0 pessoas online</div>
+      <ul id="messages"></ul>
+      <div id="typing">Alguém está digitando...</div>
+      <form id="form" action="">
+        <div id="emoji-container">
+          <button id="emoji-button">😊</button>
+          <div id="emoji-menu">
+            <span class="emoji">😊</span>
+            <span class="emoji">😂</span>
+            <span class="emoji">😍</span>
+            <span class="emoji">😎</span>
+            <span class="emoji">😭</span>
+            <span class="emoji">👍</span>
+            <span class="emoji">👎</span>
+            <span class="emoji">🎉</span>
+            <span class="emoji">❤️</span>
+            <span class="emoji">🔥</span>
+            <span class="emoji">💯</span>
+            <span class="emoji">😜</span>
+            <span class="emoji">😉</span>
+          </div>
+        </div>
+        <input id="input" autocomplete="off" placeholder="Digite sua mensagem aqui..." />
+        <input type="file" id="imageInput" accept="image/*" style="display:none;">
+        <button type="button" id="uploadButton">📷</button>
+        <button type="button" id="recordButton">🎤</button>
+        <button type="submit">Enviar</button>
+      </form>
+    </div>
+
+    <script src="/socket.io/socket.io.js"></script>
+    <script>
+      var socket = io();
+
+      var form = document.getElementById('form');
+      var input = document.getElementById('input');
+      var uploadButton = document.getElementById('uploadButton');
+      var imageInput = document.getElementById('imageInput');
+      var userCount = document.getElementById('user-count');
+      var typingIndicator = document.getElementById('typing');
+
+      // Variável para rastrear o estado de digitação
+      var typing = false;
+      var timeout;
+
+      // Função para parar de mostrar o indicador de digitação
+      function timeoutFunction() {
+          typing = false;
+          socket.emit('stop typing');
+      }
+
+      // Atualizar o número de pessoas online dinamicamente
+      socket.on('user count', function(count) {
+          userCount.textContent = count + ' pessoas online';
+      });
+
+      // Mostrar o indicador de digitação quando outro usuário estiver digitando
+      socket.on('typing', function(data) {
+          typingIndicator.style.display = 'block';
+          typingIndicator.textContent = data.username + " está digitando...";
+      });
+
+      // Ocultar o indicador de digitação quando o usuário parar de digitar
+      socket.on('stop typing', function() {
+          typingIndicator.style.display = 'none';
+      });
+
+      // Detectar entrada de texto no campo de entrada
+      input.addEventListener('input', function() {
+          if (input.value && !typing) {
+              typing = true;
+              socket.emit('typing', { username: 'Outro usuário' });
+              clearTimeout(timeout);
+              timeout = setTimeout(timeoutFunction, 3000);
+          } else {
+              clearTimeout(timeout);
+              timeout = setTimeout(timeoutFunction, 3000);
+          }
+      });
+
+      // Enviar a mensagem e parar a indicação de digitação
+      form.addEventListener('submit', function(e) {
+          e.preventDefault();
+          if (input.value.trim()) {
+              socket.emit('chat message', 
+              input.value);
+              input.value = '';
+              socket.emit('stop typing');
+          }
+      });
+
+      // Função para enviar uma imagem
+      uploadButton.addEventListener('click', function() {
+          imageInput.click();
+      });
+
+      imageInput.addEventListener('change', function() {
+          var file = imageInput.files[0];
+          if (file) {
+              var reader = new FileReader();
+              reader.onload = function(evt) {
+                  socket.emit('chat image', evt.target.result); // Enviar a imagem como uma URL base64
+                  input.value = ''; // Limpar o campo de texto
+              };
+              reader.readAsDataURL(file);
+          }
+      });
+
+      // Receber e exibir as imagens no chat
+      socket.on('chat image', function(imgData) {
+          var item = document.createElement('li');
+          var img = document.createElement('img');
+          img.src = imgData;
+          img.style.maxWidth = '200px'; // Limitar o tamanho da imagem
+          img.style.maxHeight = '200px';
+          item.appendChild(img);
+          document.getElementById('messages').appendChild(item);
+          window.scrollTo(0, document.body.scrollHeight);
+      });
+
+      // Função para inserir emoji no campo de entrada
+      document.getElementById('emoji-menu').addEventListener('click', function(e) {
+          if (e.target.classList.contains('emoji')) {
+              input.value += e.target.textContent;
+              input.focus();
+          }
+      });
+
+      // Mostrar/ocultar o menu de emojis ao clicar no botão de emojis
+      document.getElementById('emoji-button').addEventListener('click', function(e) {
+          var emojiMenu = document.getElementById('emoji-menu');
+          if (emojiMenu.style.display === 'block') {
+              emojiMenu.style.display = 'none';
+          } else {
+              emojiMenu.style.display = 'block';
+          }
+      });
+
+      // Fechar o menu de emojis ao clicar fora dele
+      document.addEventListener('click', function(e) {
+          if (!document.getElementById('emoji-container').contains(e.target)) {
+              document.getElementById('emoji-menu').style.display = 'none';
+          }
+      });
+
+      // Receber e exibir as mensagens no chat
+      socket.on('chat message', function(msg) {
+          var item = document.createElement('li');
+          item.textContent = msg;
+          document.getElementById('messages').appendChild(item);
+          window.scrollTo(0, document.body.scrollHeight);
+      });
+
+      let mediaRecorder;
+      let audioChunks = [];
+
+      const recordButton = document.getElementById('recordButton');
+
+      recordButton.addEventListener('mousedown', () => {
+          navigator.mediaDevices.getUserMedia({ audio: true })
+              .then(stream => {
+                  mediaRecorder = new MediaRecorder(stream);
+                  mediaRecorder.start();
+
+                  mediaRecorder.addEventListener('dataavailable', event => {
+                      audioChunks.push(event.data);
+                  });
+
+                  mediaRecorder.addEventListener('stop', () => {
+                      const audioBlob = new Blob(audioChunks, { type: 'audio/wav' });
+                      audioChunks = [];
+                      
+                      // Aplicar efeito de "voz de balão" aqui antes de enviar
+                      applyBalloonEffect(audioBlob).then(modifiedBlob => {
+                          const reader = new FileReader();
+                          reader.readAsDataURL(modifiedBlob);
+                          reader.onloadend = () => {
+                              const base64data = reader.result;
+                              socket.emit('chat audio', base64data);
+                          };
+                      });
+                  });
+              });
+      });
+
+      recordButton.addEventListener('mouseup', () => {
+          mediaRecorder.stop();
+      });
+
+      function applyBalloonEffect(audioBlob) {
+          // Aqui você pode aplicar o efeito de voz "balão".
+          // Isso pode ser feito através de uma manipulação de áudio usando a Web Audio API ou um processamento offline.
+          // Como o processamento de áudio é complexo, vamos simplificar e simular a modificação.
+          
+          return new Promise((resolve) => {
+              // Simulação de efeito (em um caso real, processaríamos o áudio de verdade)
+              resolve(audioBlob);
+          });
+      }
+
+      socket.on('chat audio', (audioData) => {
+          const audio = new Audio(audioData);
+          const item = document.createElement('li');
+          item.appendChild(audio);
+          document.getElementById('messages').appendChild(item);
+          audio.controls = true;
+          audio.play();
+});
+
+
+    </script>
+  </body>
+</html>
